@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="glass-panel" style="display: flex; padding: 0; overflow: hidden; min-height: 70vh;">
+    <div class="auth-sidebar" style="flex: 1; padding: 60px;">
+        <h1>Welcome Back to CashX</h1>
+        <p style="font-size: 1.2rem; opacity: 0.9; margin-top: 20px;">The ultimate digital ecosystem for fast payments, travel booking, and high-yield gold investments.</p>
+    </div>
+    <div class="auth-form-wrapper" style="flex: 1; display: flex; justify-content: center; align-items: center; padding: 40px; background: rgba(15, 23, 42, 0.4);">
+        <div style="width: 100%; max-width: 350px;">
+            <h2 style="margin-bottom: 30px; font-size: 2rem;">Secure Login</h2>
+            <form method="POST" action="{{ url_for('auth.login') }}">
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" name="phone_number" class="form-control" placeholder="e.g. 9876543210" required>
+                </div>
+                <div class="form-group">
+                    <label>Secure PIN</label>
+                    <input type="password" name="pin" class="form-control" placeholder="Enter your PIN" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; margin-top: 10px;">Login to Wallet</button>
+            </form>
+            <p style="margin-top: 25px; text-align: center; color: var(--text-muted);">
+                Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-primary" style="text-decoration: none; font-weight: 600;">Register Now</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

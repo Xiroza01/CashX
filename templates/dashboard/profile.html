@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="margin-bottom: 20px;">
+    <a href="{{ url_for('dashboard.home') }}" class="btn btn-secondary" style="padding: 8px 16px;"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+</div>
+
+<div class="glass-panel" style="max-width: 600px; margin: 0 auto;">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <img src="{{ current_user.profile_pic }}" alt="Profile Picture" style="width: 100px; height: 100px; border-radius: 50px; border: 3px solid var(--primary); object-fit: cover; margin-bottom: 15px;">
+        <h2>Edit Profile</h2>
+        <p class="text-muted">Update your personal details below.</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('dashboard.profile') }}">
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" name="name" class="form-control" value="{{ current_user.name }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Phone Number (Read-only)</label>
+            <input type="text" class="form-control" value="{{ current_user.phone_number }}" disabled style="background: rgba(0,0,0,0.2);">
+        </div>
+        
+        <div class="form-group">
+            <label>UPI ID (Read-only)</label>
+            <input type="text" class="form-control" value="{{ current_user.upi_id }}" disabled style="background: rgba(0,0,0,0.2);">
+        </div>
+
+        <div class="form-group">
+            <label>Profile Picture URL</label>
+            <input type="url" name="profile_pic" class="form-control" value="{{ current_user.profile_pic }}">
+        </div>
+
+        <div class="form-group">
+            <label>New PIN (Leave blank to keep current PIN)</label>
+            <input type="password" name="pin" class="form-control" placeholder="****">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 15px; margin-top: 15px;">Save Changes</button>
+    </form>
+</div>
+{% endblock %}

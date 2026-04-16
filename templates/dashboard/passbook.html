@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="margin-bottom: 20px;">
+    <a href="{{ url_for('dashboard.home') }}" class="btn btn-secondary" style="padding: 8px 16px;"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+</div>
+
+<div class="glass-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h2><i class="fa-solid fa-book" style="color: var(--primary);"></i> Passbook</h2>
+        <div style="text-align: right;">
+            <p style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Available Balance</p>
+            <p class="balance-display" style="font-size: 1.5rem; margin: 0;">₹{{ "%.2f"|format(current_user.balance) }}</p>
+        </div>
+    </div>
+    
+    <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="#" class="btn btn-primary" style="padding: 6px 15px; font-size: 0.9rem; flex: 1; max-width: 100px;">All</a>
+        <a href="#" class="btn btn-secondary" style="padding: 6px 15px; font-size: 0.9rem; flex: 1; max-width: 100px;">Payments</a>
+        <a href="#" class="btn btn-secondary" style="padding: 6px 15px; font-size: 0.9rem; flex: 1; max-width: 100px;">Recharges</a>
+        <div style="flex: 1;"></div>
+        <a href="#" class="btn btn-secondary" style="padding: 6px 15px; font-size: 0.9rem;"><i class="fa-solid fa-download"></i> Download Statement</a>
+    </div>
+
+    {% if transactions %}
+    <div style="overflow-x: auto;">
+        <table class="passbook-table">
+            <thead>
+                <tr>
+                    <th>Date & Time</th>
+                    <th>Transaction ID</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tx in transactions %}
+                <tr>
+                    <td style="color: var(--text-muted); font-size: 0.9rem;">{{ tx.timestamp.strftime('%d %b %Y, %I:%M %p') }}</td>
+                    <td style="font-family: monospace; color: var(--text-muted);">TXN{{ "%.6d"|format(tx.id) }}</td>
+                    <td style="font-weight: 500;">{{ tx.description }}</td>
+                    <td><span style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; text-transform: capitalize;">{{ tx.category }}</span></td>
+                    <td><span class="text-success"><i class="fa-solid fa-circle-check"></i> {{ tx.status }}</span></td>
+                    <td style="text-align: right; font-weight: 600;" class="{{ 'text-success' if tx.type == 'credit' else 'text-danger' }}">
+                        {% if tx.type == 'credit' %}+{% else %}-{% endif %}₹{{ "%.2f"|format(tx.amount|abs) }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 50px 20px;">
+        <i class="fa-solid fa-folder-open text-muted" style="font-size: 3rem; margin-bottom: 20px;"></i>
+        <p class="text-muted">No transactions found.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

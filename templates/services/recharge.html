@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="margin-bottom: 20px;">
+    <a href="{{ url_for('dashboard.home') }}" class="btn btn-secondary" style="padding: 8px 16px;"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</div>
+
+<div class="glass-panel" style="max-width: 600px; margin: 0 auto;">
+    <h2 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-bolt" style="color: var(--warning);"></i> Recharges & Utilities</h2>
+    
+    <div style="display: flex; gap: 10px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 5px;">
+        <div style="padding: 10px 20px; background: var(--primary); border-radius: 100px; font-size: 0.9rem; font-weight: 500; cursor: pointer; white-space: nowrap;">Mobile Recharge</div>
+        <div style="padding: 10px 20px; background: rgba(255,255,255,0.1); border-radius: 100px; font-size: 0.9rem; font-weight: 500; cursor: pointer; white-space: nowrap;">Electricity</div>
+        <div style="padding: 10px 20px; background: rgba(255,255,255,0.1); border-radius: 100px; font-size: 0.9rem; font-weight: 500; cursor: pointer; white-space: nowrap;">Fastag</div>
+        <div style="padding: 10px 20px; background: rgba(255,255,255,0.1); border-radius: 100px; font-size: 0.9rem; font-weight: 500; cursor: pointer; white-space: nowrap;">DTH / Cable</div>
+    </div>
+
+    <form method="POST" action="{{ url_for('services.recharge') }}">
+        <div class="form-group">
+            <label>Select Provider</label>
+            <select name="provider" class="form-control" style="appearance: none; background-color: rgba(15, 23, 42, 0.6);" required>
+                <option value="Jio Mobile">Jio Mobile</option>
+                <option value="Airtel Prepaid">Airtel Prepaid</option>
+                <option value="Vi Prepaid">Vi Prepaid</option>
+                <option value="BSNL Recharge">BSNL Recharge</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Mobile Number / Consumer Number</label>
+            <input type="text" class="form-control" placeholder="10-digit number" required>
+        </div>
+
+        <div class="form-group">
+            <label>Amount (₹)</label>
+            <div style="display: flex; gap: 10px;">
+                <input type="number" name="amount" class="form-control" placeholder="0.00" required style="flex: 1;">
+                <button type="button" class="btn btn-secondary" style="padding: 0 20px;">Browse Plans</button>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 15px; margin-top: 15px;">Pay Bill</button>
+    </form>
+</div>
+{% endblock %}

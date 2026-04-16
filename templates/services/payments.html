@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="margin-bottom: 20px;">
+    <a href="{{ url_for('dashboard.home') }}" class="btn btn-secondary" style="padding: 8px 16px;"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</div>
+
+<div style="display: flex; gap: 30px; align-items: flex-start;">
+    <div class="glass-panel" style="flex: 2;">
+        <h2 style="margin-bottom: 20px;"><i class="fa-solid fa-paper-plane" style="color: var(--primary);"></i> Send Money (UPI)</h2>
+        <form method="POST" action="{{ url_for('services.pay') }}">
+            <div class="form-group">
+                <label>To UPI ID or Phone Number</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" name="upi_id" class="form-control" placeholder="e.g. 9876543210@cashx" required style="flex: 1;">
+                    <button type="button" class="btn btn-secondary" style="padding: 0 20px;" title="Scan QR"><i class="fa-solid fa-qrcode" style="font-size: 1.2rem;"></i></button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Amount (₹)</label>
+                <input type="number" name="amount" class="form-control" placeholder="0.00" step="0.01" min="1" required style="font-size: 1.5rem; font-weight: 600;">
+            </div>
+
+            <div class="form-group">
+                <label>Enter 4-digit PIN to Confirm</label>
+                <input type="password" name="pin" class="form-control" placeholder="****" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 15px;">Send Money securely</button>
+        </form>
+    </div>
+
+    <div class="glass-panel" style="flex: 1; background: linear-gradient(135deg, rgba(30,41,59,0.8), rgba(15,23,42,0.9));">
+        <h3 style="margin-bottom: 20px;">Instant Quick Actions</h3>
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer;">
+                <div style="width: 40px; height: 40px; border-radius: 20px; background: rgba(139, 92, 246, 0.2); display: flex; align-items: center; justify-content: center; color: var(--primary);">
+                    <i class="fa-solid fa-user-group"></i>
+                </div>
+                <div>
+                    <h4 style="font-size: 1rem; margin:0;">Pay Contacts</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin:0;">Send money to saved contacts</p>
+                </div>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer;">
+                <div style="width: 40px; height: 40px; border-radius: 20px; background: rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; color: var(--success);">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div>
+                    <h4 style="font-size: 1rem; margin:0;">UPI Lite</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin:0;">Instant PIN-less payments</p>
+                </div>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer;">
+                <div style="width: 40px; height: 40px; border-radius: 20px; background: rgba(245, 158, 11, 0.2); display: flex; align-items: center; justify-content: center; color: var(--warning);">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+                <div>
+                    <h4 style="font-size: 1rem; margin:0;">UPI AutoPay</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin:0;">Manage recurring payments</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="margin-bottom: 40px;">
+    <h2>Welcome back, {{ current_user.name }}!</h2>
+    <p class="text-muted">Your UPI ID: <span class="text-primary">{{ current_user.upi_id }}</span></p>
+</div>
+
+<div style="display: flex; gap: 20px; margin-bottom: 40px;">
+    <!-- Wallet Balance Card -->
+    <div class="glass-panel" style="flex: 1; background: linear-gradient(135deg, rgba(30,41,59,0.8) 0%, rgba(15,23,42,0.9) 100%);">
+        <p style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">CashX Wallet Balance</p>
+        <div class="balance-display">₹{{ "%.2f"|format(current_user.balance) }}</div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <a href="{{ url_for('services.pay') }}" class="btn btn-primary" style="flex: 1; padding: 8px;"><i class="fa-solid fa-paper-plane"></i> Send</a>
+            <a href="#" class="btn btn-secondary" style="flex: 1; padding: 8px;"><i class="fa-solid fa-qrcode"></i> Receive</a>
+        </div>
+    </div>
+
+    <!-- LinkedIn Banks Card -->
+    <div class="glass-panel" style="flex: 1;">
+        <p style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Total Bank Balance</p>
+        <div class="balance-display" style="background: linear-gradient(to right, #10B981, #34D399); -webkit-background-clip: text;">₹{{ "%.2f"|format(bank_balance) }}</div>
+        <p style="margin-top: 10px; font-size: 0.9rem;">From {{ current_user.linked_banks|length }} linked accounts</p>
+    </div>
+
+    <!-- Digital Gold Card -->
+    <div class="glass-panel" style="flex: 1;">
+        <p style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Digital Gold Balance</p>
+        <div class="balance-display" style="background: linear-gradient(to right, #F59E0B, #FBBF24); -webkit-background-clip: text;">{{ "%.4f"|format(current_user.gold_balance_grams) }}g</div>
+        <p style="margin-top: 10px; font-size: 0.9rem;"><a href="{{ url_for('services.invest') }}" class="text-warning" style="text-decoration:none;">Invest More <i class="fa-solid fa-arrow-right"></i></a></p>
+    </div>
+</div>
+
+<h3 style="margin-bottom: 20px;">Services</h3>
+<div class="dashboard-grid">
+    <a href="{{ url_for('services.pay') }}" class="glass-panel widget">
+        <i class="fa-solid fa-money-bill-transfer"></i>
+        <h4>Payments & UPI</h4>
+    </a>
+    <a href="{{ url_for('services.recharge') }}" class="glass-panel widget">
+        <i class="fa-solid fa-mobile-screen"></i>
+        <h4>Recharges & Bills</h4>
+    </a>
+    <a href="{{ url_for('services.travel') }}" class="glass-panel widget">
+        <i class="fa-solid fa-plane-departure"></i>
+        <h4>Travel & Booking</h4>
+    </a>
+    <a href="{{ url_for('services.invest') }}" class="glass-panel widget">
+        <i class="fa-solid fa-coins"></i>
+        <h4>Invest in Gold</h4>
+    </a>
+</div>
+
+<div class="glass-panel" style="margin-bottom: 40px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3>Recent Transactions</h3>
+        <a href="{{ url_for('dashboard.passbook') }}" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.9rem;">View All</a>
+    </div>
+    {% if transactions %}
+    <table class="passbook-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th style="text-align: right;">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tx in transactions %}
+            <tr>
+                <td style="color: var(--text-muted); font-size: 0.9rem;">{{ tx.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td style="font-weight: 500;">{{ tx.description }}</td>
+                <td><span style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; text-transform: capitalize;">{{ tx.category }}</span></td>
+                <td><span class="text-success"><i class="fa-solid fa-circle-check"></i> {{ tx.status }}</span></td>
+                <td style="text-align: right; font-weight: 600;" class="{{ 'text-success' if tx.type == 'credit' else '' }}">
+                    {% if tx.type == 'credit' %}+{% endif %}₹{{ "%.2f"|format(tx.amount) }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color: var(--text-muted); text-align: center; padding: 20px;">No transactions yet.</p>
+    {% endif %}
+</div>
+{% endblock %}
