@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="glass-panel auth-container"
+     style="padding:0; overflow:hidden; min-height:70vh; display:flex;">
+
+    <!-- LEFT SIDE -->
+    <div class="auth-sidebar" style="flex:1; padding:60px;">
+        <h1>Verify Your Identity</h1>
+
+        <p style="font-size:1.2rem; opacity:0.9; margin-top:20px;">
+            We've sent a 6-digit One-Time Password to your registered
+            <b>{{ method }}</b>.
+        </p>
+
+        {% if email %}
+        <p style="margin-top:10px;">Email: {{ email }}</p>
+        {% endif %}
+
+        {% if phone %}
+        <p style="margin-top:10px;">Phone: {{ phone }}</p>
+        {% endif %}
+    </div>
+
+
+    <!-- RIGHT SIDE -->
+    <div class="auth-form-wrapper"
+         style="flex:1; display:flex; justify-content:center;
+                align-items:center; padding:40px;
+                background: rgba(15,23,42,0.4);">
+
+        <div style="width:100%; max-width:350px;">
+
+            <h2 style="margin-bottom:30px; font-size:2rem;">
+                Enter OTP
+            </h2>
+
+            <!-- FLASH MESSAGE -->
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="alert alert-danger">
+                        {{ messages[0] }}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- OTP FORM -->
+            <form method="POST" action="{{ url_for('auth.verify_otp') }}">
+
+                <div class="form-group">
+                    <label>One-Time Password</label>
+
+                    <input
+                        type="text"
+                        name="otp"
+                        maxlength="6"
+                        pattern="[0-9]{6}"
+                        class="form-control"
+                        placeholder="Enter 6-digit OTP"
+                        required
+                        autofocus
+                    >
+                </div>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                    style="width:100%; font-size:1.1rem; margin-top:15px;">
+                    Verify & Login
+                </button>
+
+            </form>
+
+            <!-- RESEND -->
+            <p style="margin-top:25px; text-align:center; color:var(--text-muted);">
+                Didn't receive code?
+                <a href="{{ url_for('auth.resend_otp') }}"
+                   class="text-primary"
+                   style="text-decoration:none; font-weight:600;">
+                   Resend OTP
+                </a>
+            </p>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -7,43 +7,44 @@
 <div class="glass-panel" style="max-width: 700px; margin: 0 auto; background: linear-gradient(to bottom right, rgba(30,41,59,0.8), rgba(15,23,42,0.9));">
     
     <div style="display: flex; gap: 15px; margin-bottom: 30px;">
-        <div style="flex: 1; text-align: center; padding: 15px; background: var(--primary); border-radius: 12px; cursor: pointer;">
+        <div class="travel-tab active" data-type="Flights" style="flex: 1; text-align: center; padding: 15px; background: var(--primary); border-radius: 12px; cursor: pointer;">
             <i class="fa-solid fa-plane" style="font-size: 1.5rem; margin-bottom: 5px;"></i><br>Flights
         </div>
-        <div style="flex: 1; text-align: center; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer;">
+        <div class="travel-tab" data-type="Trains" style="flex: 1; text-align: center; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer;">
             <i class="fa-solid fa-train" style="font-size: 1.5rem; margin-bottom: 5px;"></i><br>Trains
         </div>
-        <div style="flex: 1; text-align: center; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer;">
+        <div class="travel-tab" data-type="Buses" style="flex: 1; text-align: center; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer;">
             <i class="fa-solid fa-bus" style="font-size: 1.5rem; margin-bottom: 5px;"></i><br>Buses
         </div>
-        <div style="flex: 1; text-align: center; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer;">
+        <div class="travel-tab" data-type="Movies" style="flex: 1; text-align: center; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer;">
             <i class="fa-solid fa-film" style="font-size: 1.5rem; margin-bottom: 5px;"></i><br>Movies
         </div>
     </div>
 
     <form method="POST" action="{{ url_for('services.travel') }}">
-        <div style="display: flex; gap: 20px;">
+        <input type="hidden" name="booking_type" id="booking_type" value="Flights">
+        <div class="form-row">
             <div class="form-group" style="flex: 1;">
-                <label>From</label>
-                <input type="text" class="form-control" placeholder="Origin City" required>
+                <label id="from_label">From</label>
+                <input type="text" id="origin_input" class="form-control" placeholder="Origin City" required>
             </div>
             <div style="display: flex; align-items: center; justify-content: center; margin-top: 10px;">
                 <i class="fa-solid fa-arrow-right-arrow-left text-muted" style="cursor: pointer;"></i>
             </div>
             <div class="form-group" style="flex: 1;">
-                <label>To</label>
-                <input type="text" name="destination" class="form-control" placeholder="Destination City" required>
+                <label id="to_label">To</label>
+                <input type="text" name="destination" id="dest_input" class="form-control" placeholder="Destination City" required>
             </div>
         </div>
 
-        <div style="display: flex; gap: 20px;">
+        <div class="form-row">
             <div class="form-group" style="flex: 1;">
-                <label>Departure Date</label>
+                <label>Date</label>
                 <input type="date" class="form-control" required>
             </div>
             <div class="form-group" style="flex: 1;">
-                <label>Passengers & Class</label>
-                <select class="form-control" style="appearance: none; background-color: rgba(15, 23, 42, 0.6);" required>
+                <label>Options / Class</label>
+                <select id="passenger_select" class="form-control" style="appearance: none; background-color: rgba(15, 23, 42, 0.6);" required>
                     <option>1 Adult, Economy</option>
                     <option>2 Adults, Economy</option>
                     <option>1 Adult, Business</option>
@@ -52,10 +53,57 @@
         </div>
 
         <div style="margin: 20px 0; padding: 15px; background: rgba(16, 185, 129, 0.1); border-left: 4px solid var(--success); border-radius: 4px;">
-            <p style="margin: 0; color: var(--success);"><i class="fa-solid fa-tag"></i> <strong>Special Offer!</strong> Flat Mock Fare: ₹5000 for any destination.</p>
+            <p style="margin: 0; color: var(--success);"><i class="fa-solid fa-tag"></i> <strong>Special Offer!</strong> Flat Mock Fare: ₹5000 for any booking.</p>
         </div>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 15px;">Search & Book Flights</button>
+        <button type="submit" id="submit_btn" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 15px;">Search & Book Flights</button>
     </form>
 </div>
+
+<script>
+    const travelTabs = document.querySelectorAll('.travel-tab');
+    const typeInput = document.getElementById('booking_type');
+    const fromLabel = document.getElementById('from_label');
+    const toLabel = document.getElementById('to_label');
+    const originInput = document.getElementById('origin_input');
+    const destInput = document.getElementById('dest_input');
+    const submitBtn = document.getElementById('submit_btn');
+    const passengerSelect = document.getElementById('passenger_select');
+
+    const config = {
+        'Flights': { from: 'Origin City', to: 'Destination City', btn: 'Search & Book Flights', opts: ['1 Adult, Economy', '2 Adults, Economy', '1 Adult, Business'] },
+        'Trains': { from: 'Origin Station', to: 'Destination Station', btn: 'Search Trains', opts: ['1 Adult, Sleeper', '1 Adult, AC 3-Tier', '2 Adults, AC 2-Tier'] },
+        'Buses': { from: 'Origin City', to: 'Destination City', btn: 'Find Buses', opts: ['1 Seat, AC Seater', '1 Seat, Non-AC Sleeper'] },
+        'Movies': { from: 'Your City', to: 'Movie Name', btn: 'Book Tickets', opts: ['1 Seat, Silver', '2 Seats, Gold', '2 Seats, Recliner'] }
+    };
+
+    travelTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            travelTabs.forEach(t => {
+                t.style.background = 'rgba(255,255,255,0.05)';
+                t.classList.remove('active');
+            });
+            tab.style.background = 'var(--primary)';
+            tab.classList.add('active');
+            
+            const type = tab.dataset.type;
+            typeInput.value = type;
+            
+            fromLabel.textContent = type === 'Movies' ? 'City' : 'From';
+            originInput.placeholder = config[type].from;
+            
+            toLabel.textContent = type === 'Movies' ? 'Movie' : 'To';
+            destInput.placeholder = config[type].to;
+            
+            submitBtn.textContent = config[type].btn;
+            
+            passengerSelect.innerHTML = '';
+            config[type].opts.forEach(o => {
+                const opt = document.createElement('option');
+                opt.textContent = o;
+                passengerSelect.appendChild(opt);
+            });
+        });
+    });
+</script>
 {% endblock %}

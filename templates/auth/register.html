@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="glass-panel" style="display: flex; padding: 0; overflow: hidden; min-height: 70vh;">
+<div class="glass-panel auth-container" style="padding: 0; overflow: hidden; min-height: 70vh;">
     <div class="auth-sidebar" style="flex: 1; padding: 60px;">
         <h1>Join CashX Today</h1>
         <p style="font-size: 1.2rem; opacity: 0.9; margin-top: 20px;">Create your unified account to manage UPI, link banks, pay bills, and start investing.</p>
@@ -11,17 +11,17 @@
             <form method="POST" action="{{ url_for('auth.register') }}">
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" name="name" class="form-control" placeholder="John Doe" required>
+                    <input type="text" name="name" class="form-control" placeholder="e.g. John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" class="form-control" placeholder="e.g. john@example.com">
                 </div>
                 <div class="form-group">
                     <label>Phone Number</label>
                     <input type="text" name="phone_number" class="form-control" placeholder="e.g. 9876543210" required>
                 </div>
-                <div class="form-group">
-                    <label>Set Secure PIN</label>
-                    <input type="password" name="pin" class="form-control" placeholder="Create a PIN" required>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; margin-top: 10px;">Create Account</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; margin-top: 10px;">Send OTP to Register</button>
             </form>
             <p style="margin-top: 25px; text-align: center; color: var(--text-muted);">
                 Already have an account? <a href="{{ url_for('auth.login') }}" class="text-primary" style="text-decoration: none; font-weight: 600;">Login</a>

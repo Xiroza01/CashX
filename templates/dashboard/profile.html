@@ -11,7 +11,7 @@
         <p class="text-muted">Update your personal details below.</p>
     </div>
 
-    <form method="POST" action="{{ url_for('dashboard.profile') }}">
+    <form method="POST" action="{{ url_for('dashboard.profile') }}" enctype="multipart/form-data">
         <div class="form-group">
             <label>Full Name</label>
             <input type="text" name="name" class="form-control" value="{{ current_user.name }}" required>
@@ -28,8 +28,13 @@
         </div>
 
         <div class="form-group">
-            <label>Profile Picture URL</label>
-            <input type="url" name="profile_pic" class="form-control" value="{{ current_user.profile_pic }}">
+            <label>Mock Bank Balance (₹)</label>
+            <input type="number" name="bank_balance" class="form-control" value="{{ current_user.linked_banks[0].balance if current_user.linked_banks else 0 }}">
+        </div>
+
+        <div class="form-group">
+            <label>Upload Profile Picture (Image File)</label>
+            <input type="file" name="profile_pic_file" accept="image/*" class="form-control" style="padding-top: 10px;">
         </div>
 
         <div class="form-group">

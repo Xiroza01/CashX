@@ -5,14 +5,47 @@
     <p class="text-muted">Your UPI ID: <span class="text-primary">{{ current_user.upi_id }}</span></p>
 </div>
 
-<div style="display: flex; gap: 20px; margin-bottom: 40px;">
+<div class="flex-container">
     <!-- Wallet Balance Card -->
     <div class="glass-panel" style="flex: 1; background: linear-gradient(135deg, rgba(30,41,59,0.8) 0%, rgba(15,23,42,0.9) 100%);">
         <p style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">CashX Wallet Balance</p>
         <div class="balance-display">₹{{ "%.2f"|format(current_user.balance) }}</div>
-        <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <div class="action-buttons">
+            <a href="#" class="btn btn-success" style="flex: 1; padding: 8px;" onclick="document.getElementById('add-money-modal').style.display='flex'; return false;"><i class="fa-solid fa-plus"></i> Add Money</a>
             <a href="{{ url_for('services.pay') }}" class="btn btn-primary" style="flex: 1; padding: 8px;"><i class="fa-solid fa-paper-plane"></i> Send</a>
-            <a href="#" class="btn btn-secondary" style="flex: 1; padding: 8px;"><i class="fa-solid fa-qrcode"></i> Receive</a>
+            <a href="#" class="btn btn-secondary" style="flex: 1; padding: 8px;" onclick="document.getElementById('receive-modal').style.display='flex'; return false;"><i class="fa-solid fa-qrcode"></i> Receive</a>
+        </div>
+    </div>
+    
+    <!-- Add Money Modal -->
+    <div id="add-money-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+        <div style="background: var(--bg-card); padding: 40px; border-radius: 20px; text-align: center; max-width: 400px; width: 90%; position: relative; border: 1px solid var(--glass-border);">
+            <button type="button" onclick="document.getElementById('add-money-modal').style.display='none';" style="position: absolute; top: 15px; right: 20px; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            
+            <h3 style="margin-bottom: 20px; color: var(--primary);">Add Money to Wallet</h3>
+            <form action="{{ url_for('dashboard.add_money') }}" method="POST">
+                <div class="form-group" style="margin-bottom: 20px; text-align: left;">
+                    <label>Amount (₹)</label>
+                    <input type="number" name="amount" class="form-control" placeholder="Enter amount" min="1" step="0.01" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1.1rem;">Add Money</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hidden Receive Modal -->
+    <div id="receive-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+        <div style="background: var(--bg-card); padding: 40px; border-radius: 20px; text-align: center; max-width: 400px; width: 90%; position: relative; border: 1px solid var(--glass-border);">
+            <button type="button" onclick="document.getElementById('receive-modal').style.display='none';" style="position: absolute; top: 15px; right: 20px; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            
+            <h3 style="margin-bottom: 20px; color: var(--primary);">Receive Payments</h3>
+            <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 20px;">Show this barcode. Anyone can scan this using Paytm, PhonePe, or GPay to securely send you money.</p>
+            
+            <div style="background: white; padding: 15px; border-radius: 15px; display: inline-block; margin-bottom: 20px;">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa={{ current_user.upi_id }}%26pn={{ current_user.name|urlencode }}" alt="Receive QR Code">
+            </div>
+            
+            <p style="font-weight: 600; font-size: 1.1rem; letter-spacing: 1px;">{{ current_user.upi_id }}</p>
         </div>
     </div>
 
@@ -52,7 +85,7 @@
 </div>
 
 <div class="glass-panel" style="margin-bottom: 40px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div class="section-header">
         <h3>Recent Transactions</h3>
         <a href="{{ url_for('dashboard.passbook') }}" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.9rem;">View All</a>
     </div>

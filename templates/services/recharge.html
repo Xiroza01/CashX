@@ -7,38 +7,92 @@
 <div class="glass-panel" style="max-width: 600px; margin: 0 auto;">
     <h2 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-bolt" style="color: var(--warning);"></i> Recharges & Utilities</h2>
     
-    <div style="display: flex; gap: 10px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 5px;">
-        <div style="padding: 10px 20px; background: var(--primary); border-radius: 100px; font-size: 0.9rem; font-weight: 500; cursor: pointer; white-space: nowrap;">Mobile Recharge</div>
-        <div style="padding: 10px 20px; background: rgba(255,255,255,0.1); border-radius: 100px; font-size: 0.9rem; font-weight: 500; cursor: pointer; white-space: nowrap;">Electricity</div>
-        <div style="padding: 10px 20px; background: rgba(255,255,255,0.1); border-radius: 100px; font-size: 0.9rem; font-weight: 500; cursor: pointer; white-space: nowrap;">Fastag</div>
-        <div style="padding: 10px 20px; background: rgba(255,255,255,0.1); border-radius: 100px; font-size: 0.9rem; font-weight: 500; cursor: pointer; white-space: nowrap;">DTH / Cable</div>
+    <div style="display: flex; gap: 10px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 5px;" id="recharge-tabs">
+        <div class="tab-btn active" data-type="mobile" style="padding: 10px 20px; background: var(--primary); border-radius: 100px; font-size: 0.9rem; font-weight: 500; cursor: pointer; white-space: nowrap;">Mobile Recharge</div>
+        <div class="tab-btn" data-type="electricity" style="padding: 10px 20px; background: rgba(255,255,255,0.1); border-radius: 100px; font-size: 0.9rem; font-weight: 500; cursor: pointer; white-space: nowrap;">Electricity</div>
+        <div class="tab-btn" data-type="fastag" style="padding: 10px 20px; background: rgba(255,255,255,0.1); border-radius: 100px; font-size: 0.9rem; font-weight: 500; cursor: pointer; white-space: nowrap;">Fastag</div>
+        <div class="tab-btn" data-type="dth" style="padding: 10px 20px; background: rgba(255,255,255,0.1); border-radius: 100px; font-size: 0.9rem; font-weight: 500; cursor: pointer; white-space: nowrap;">DTH / Cable</div>
     </div>
 
     <form method="POST" action="{{ url_for('services.recharge') }}">
+        <input type="hidden" name="biller_type" id="biller_type" value="mobile">
         <div class="form-group">
-            <label>Select Provider</label>
-            <select name="provider" class="form-control" style="appearance: none; background-color: rgba(15, 23, 42, 0.6);" required>
-                <option value="Jio Mobile">Jio Mobile</option>
-                <option value="Airtel Prepaid">Airtel Prepaid</option>
-                <option value="Vi Prepaid">Vi Prepaid</option>
-                <option value="BSNL Recharge">BSNL Recharge</option>
+            <label id="provider_label">Select Provider</label>
+            <select name="provider" id="provider_select" class="form-control" style="appearance: none; background-color: rgba(15, 23, 42, 0.6);" required>
+                <!-- JS will inject options -->
             </select>
         </div>
         
         <div class="form-group">
-            <label>Mobile Number / Consumer Number</label>
-            <input type="text" class="form-control" placeholder="10-digit number" required>
+            <label id="consumer_number_label">Mobile Number</label>
+            <input type="text" name="consumer_no" class="form-control" placeholder="10-digit number" required>
         </div>
 
         <div class="form-group">
             <label>Amount (₹)</label>
             <div style="display: flex; gap: 10px;">
                 <input type="number" name="amount" class="form-control" placeholder="0.00" required style="flex: 1;">
-                <button type="button" class="btn btn-secondary" style="padding: 0 20px;">Browse Plans</button>
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 15px; margin-top: 15px;">Pay Bill</button>
+        <button type="submit" class="btn btn-primary" id="submit_btn" style="width: 100%; font-size: 1.1rem; padding: 15px; margin-top: 15px;">Pay Bill</button>
     </form>
 </div>
+
+<script>
+    const providers = {
+        'mobile': ['Jio', 'Airtel', 'Vi Prepaid', 'BSNL'],
+        'electricity': ['BESCOM', 'Tata Power', 'Adani Electricity', 'CESC'],
+        'fastag': ['HDFC Fastag', 'ICICI Fastag', 'SBI Fastag', 'Paytm Fastag'],
+        'dth': ['Tata Play', 'Airtel Digital TV', 'Dish TV', 'Sun Direct']
+    };
+
+    const labels = {
+        'mobile': 'Mobile Number',
+        'electricity': 'Consumer Number / Account ID',
+        'fastag': 'Vehicle Registration Number',
+        'dth': 'Subscriber ID / Smart Card'
+    };
+
+    const btnTexts = {
+        'mobile': 'Recharge Mobile',
+        'electricity': 'Pay Electricity Bill',
+        'fastag': 'Recharge Fastag',
+        'dth': 'Recharge DTH'
+    };
+
+    const selectEl = document.getElementById('provider_select');
+    const labelEl = document.getElementById('consumer_number_label');
+    const btnEl = document.getElementById('submit_btn');
+    const typeInput = document.getElementById('biller_type');
+    const tabs = document.querySelectorAll('.tab-btn');
+
+    function updateForm(type) {
+        selectEl.innerHTML = '';
+        providers[type].forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p;
+            opt.textContent = p;
+            selectEl.appendChild(opt);
+        });
+        labelEl.textContent = labels[type];
+        btnEl.textContent = btnTexts[type];
+        typeInput.value = type;
+    }
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => {
+                t.style.background = 'rgba(255,255,255,0.1)';
+                t.classList.remove('active');
+            });
+            tab.style.background = 'var(--primary)';
+            tab.classList.add('active');
+            updateForm(tab.dataset.type);
+        });
+    });
+
+    // Initialize
+    updateForm('mobile');
+</script>
 {% endblock %}

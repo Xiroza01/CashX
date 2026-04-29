@@ -4,18 +4,99 @@
     <a href="{{ url_for('dashboard.home') }}" class="btn btn-secondary" style="padding: 8px 16px;"><i class="fa-solid fa-arrow-left"></i> Back</a>
 </div>
 
-<div style="display: flex; gap: 30px; align-items: flex-start;">
+<div class="flex-container" style="align-items: flex-start;">
     <div class="glass-panel" style="flex: 2;">
         <h2 style="margin-bottom: 20px;"><i class="fa-solid fa-paper-plane" style="color: var(--primary);"></i> Send Money (UPI)</h2>
         <form method="POST" action="{{ url_for('services.pay') }}">
             <div class="form-group">
                 <label>To UPI ID or Phone Number</label>
                 <div style="display: flex; gap: 10px;">
-                    <input type="text" name="upi_id" class="form-control" placeholder="e.g. 9876543210@cashx" required style="flex: 1;">
-                    <button type="button" class="btn btn-secondary" style="padding: 0 20px;" title="Scan QR"><i class="fa-solid fa-qrcode" style="font-size: 1.2rem;"></i></button>
+                    <input type="text" name="upi_id" id="upi_id_input" class="form-control" placeholder="e.g. 9876543210@cashx" required style="flex: 1;">
+                    <button type="button" class="btn btn-secondary" style="padding: 0 20px; background: var(--primary); color: white; border-color: var(--primary-dark);" onclick="document.getElementById('scanner-modal').style.display='flex';" title="Scan any QR"><i class="fa-solid fa-qrcode" style="font-size: 1.2rem;"></i></button>
                 </div>
             </div>
             
+            <!-- Hidden Scanner Modal -->
+            <div id="scanner-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+                <div style="background: var(--bg-card); padding: 40px; border-radius: 20px; text-align: center; max-width: 400px; width: 90%; position: relative; border: 1px solid var(--glass-border);">
+                    <button type="button" onclick="document.getElementById('scanner-modal').style.display='none';" style="position: absolute; top: 15px; right: 20px; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                    
+                    <h3 style="margin-bottom: 20px; color: var(--primary);">Scan any QR Code</h3>
+                    <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 30px;">Hold your camera up to a Paytm, PhonePe, or Google Pay QR code to scan securely.</p>
+                    
+                    <!-- Scanner Frame -->
+                    <div style="width: 250px; height: 250px; margin: 0 auto; border: 4px dashed var(--success); border-radius: 15px; position: relative; overflow: hidden; background: url('{{ url_for('static', filename='images/paytm-qr.png') }}') center/cover; padding: 20px;">
+                        <!-- Scanning Laser Animation -->
+                        <div style="width: 100%; height: 2px; background: var(--success); box-shadow: 0 0 10px var(--success); position: absolute; left: 0; top: 0; animation: scan 2s linear infinite;"></div>
+                    </div>
+                    
+                    <div style="margin-top: 30px; display: flex; gap: 10px;">
+                        <button type="button" class="btn btn-primary" style="flex: 1;" onclick="handleScanSuccess('flipkart@paytm')">Simulate Flipkart QR</button>
+                        <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="handleScanSuccess('kfc@icici')">Simulate KFC QR</button>
+                    </div>
+                </div>
+            </div>
+            
+            <style>
+                @keyframes scan {
+                    0% { top: 0; }
+                    50% { top: 100%; }
+                    100% { top: 0; }
+                }
+            </style>
+            
+            <script>
+                function handleScanSuccess(mockUpiId) {
+                    const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+                    audio.play().catch(e => console.log('Audio restricted by browser'));
+                    
+                    document.getElementById('upi_id_input').value = mockUpiId;
+                    document.getElementById('scanner-modal').style.display = 'none';
+                    
+                    // Flash success visually
+                    document.getElementById('upi_id_input').style.backgroundColor = 'rgba(16, 185, 129, 0.2)';
+                    setTimeout(() => document.getElementById('upi_id_input').style.backgroundColor = '', 1000);
+                }
+            </script>
+            
+            <div class="form-group">
+                <label>Category</label>
+                <select id="category_select" class="form-control" style="appearance: none; background-color: rgba(15, 23, 42, 0.6);" onchange="toggleCustomCategory()">
+                    <option value="auto">Auto-detect from UPI ID</option>
+                    <option value="shopping">Shopping</option>
+                    <option value="food">Food & Dining</option>
+                    <option value="travel">Travel & Transport</option>
+                    <option value="bills">Bills & Utilities</option>
+                    <option value="recharge">Recharge</option>
+                    <option value="payment">General Payment</option>
+                    <option value="custom">Custom (Type your own...)</option>
+                </select>
+                <input type="text" id="custom_category" class="form-control" placeholder="e.g. nails, salon, rent" style="display: none; margin-top: 10px;">
+                <input type="hidden" name="category" id="final_category" value="auto">
+            </div>
+
+            <script>
+                function toggleCustomCategory() {
+                    const select = document.getElementById('category_select');
+                    const customInput = document.getElementById('custom_category');
+                    const finalCategory = document.getElementById('final_category');
+                    
+                    if (select.value === 'custom') {
+                        customInput.style.display = 'block';
+                        customInput.required = true;
+                        finalCategory.value = customInput.value;
+                    } else {
+                        customInput.style.display = 'none';
+                        customInput.required = false;
+                        finalCategory.value = select.value;
+                    }
+                }
+                
+                document.getElementById('custom_category').addEventListener('input', function() {
+                    document.getElementById('final_category').value = this.value;
+                });
+            </script>
+
             <div class="form-group">
                 <label>Amount (₹)</label>
                 <input type="number" name="amount" class="form-control" placeholder="0.00" step="0.01" min="1" required style="font-size: 1.5rem; font-weight: 600;">
@@ -33,7 +114,10 @@
     <div class="glass-panel" style="flex: 1; background: linear-gradient(135deg, rgba(30,41,59,0.8), rgba(15,23,42,0.9));">
         <h3 style="margin-bottom: 20px;">Instant Quick Actions</h3>
         <div style="display: flex; flex-direction: column; gap: 15px;">
-            <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer;">
+            <!-- Hidden file input for Contacts -->
+            <input type="file" id="contact-picker" accept="text/vcard,text/csv" style="display: none;" onchange="if(this.files.length) { alert('Contact selected: ' + this.files[0].name); document.querySelector('input[name=upi_id]').value = 'selected.contact@cashx'; }">
+            
+            <div onclick="document.getElementById('contact-picker').click();" style="display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer;">
                 <div style="width: 40px; height: 40px; border-radius: 20px; background: rgba(139, 92, 246, 0.2); display: flex; align-items: center; justify-content: center; color: var(--primary);">
                     <i class="fa-solid fa-user-group"></i>
                 </div>
@@ -43,7 +127,7 @@
                 </div>
             </div>
             
-            <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer;">
+            <div onclick="alert('Please download the official CashX App from the Apple App Store or Google Play Store to enable instant PIN-less UPI Lite transactions.');" style="display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer;">
                 <div style="width: 40px; height: 40px; border-radius: 20px; background: rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; color: var(--success);">
                     <i class="fa-solid fa-bolt"></i>
                 </div>
@@ -53,7 +137,7 @@
                 </div>
             </div>
             
-            <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer;">
+            <div onclick="const service = prompt('Which service would you like to configure AutoPay for? (e.g. Netflix, Spotify, Gym)'); if(service) { alert('UPI AutoPay for ' + service + ' has been configured successfully!'); document.querySelector('input[name=upi_id]').value = service.toLowerCase() + '@autopay'; }" style="display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer;">
                 <div style="width: 40px; height: 40px; border-radius: 20px; background: rgba(245, 158, 11, 0.2); display: flex; align-items: center; justify-content: center; color: var(--warning);">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                 </div>

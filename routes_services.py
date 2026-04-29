@@ -4,6 +4,22 @@ from models import db, Transaction
 
 services_bp = Blueprint('services', __name__)
 
+def detect_category(upi_id):
+    if not upi_id:
+        return 'payment'
+    upi_lower = upi_id.lower()
+    if any(k in upi_lower for k in ['zomato', 'swiggy', 'food', 'kfc', 'mcd', 'restaurant']):
+        return 'food'
+    if any(k in upi_lower for k in ['amazon', 'flipkart', 'myntra', 'shop', 'store', 'mart', 'supermarket']):
+        return 'shopping'
+    if any(k in upi_lower for k in ['bescom', 'electricity', 'water', 'gas', 'bill', 'utility']):
+        return 'bills'
+    if any(k in upi_lower for k in ['jio', 'airtel', 'vi', 'recharge', 'dth', 'broadband']):
+        return 'recharge'
+    if any(k in upi_lower for k in ['uber', 'ola', 'taxi', 'cab', 'travel', 'flight', 'irctc']):
+        return 'travel'
+    return 'payment'
+
 @services_bp.route('/pay', methods=['GET', 'POST'])
 @login_required
 def pay():
@@ -11,15 +27,21 @@ def pay():
         upi_id = request.form.get('upi_id')
         amount = float(request.form.get('amount') or 0)
         pin = request.form.get('pin')
+        category_choice = request.form.get('category')
 
         # In a real app we'd verify PIN against user.pin_hash here for transfer
         # For simulation, just deduct and record
         if amount > 0 and amount <= current_user.balance:
             current_user.balance -= amount
-            tx = Transaction(user_id=current_user.id, amount=-amount, type='debit', category='payment', description=f"Paid to {upi_id}")
+            if category_choice and category_choice != 'auto':
+                assigned_cat = category_choice
+            else:
+                assigned_cat = detect_category(upi_id)
+                
+            tx = Transaction(user_id=current_user.id, amount=-amount, type='debit', category=assigned_cat, description=f"Paid to {upi_id}")
             db.session.add(tx)
             db.session.commit()
-            flash(f'Payment of ₹{amount} to {upi_id} successful!', 'success')
+            flash(f'Payment of ₹{amount} to {upi_id} successful! Category: {assigned_cat.capitalize()}', 'success')
             return redirect(url_for('dashboard.home'))
         else:
             flash('Insufficient balance or invalid amount.', 'danger')
@@ -31,11 +53,25 @@ def pay():
 def recharge():
     if request.method == 'POST':
         provider = request.form.get('provider')
+        biller_type = request.form.get('biller_type', 'mobile')
         amount = float(request.form.get('amount') or 0)
+        
+        if biller_type == 'electricity':
+            category = 'bills'
+            desc = f"Electricity Bill ({provider})"
+        elif biller_type == 'fastag':
+            category = 'travel'
+            desc = f"Fastag Recharge ({provider})"
+        elif biller_type == 'dth':
+            category = 'recharge'
+            desc = f"DTH Recharge ({provider})"
+        else:
+            category = 'recharge'
+            desc = f"Mobile Recharge ({provider})"
         
         if amount > 0 and amount <= current_user.balance:
             current_user.balance -= amount
-            tx = Transaction(user_id=current_user.id, amount=-amount, type='debit', category='recharge', description=f"{provider} Recharge")
+            tx = Transaction(user_id=current_user.id, amount=-amount, type='debit', category=category, description=desc)
             db.session.add(tx)
             db.session.commit()
             flash('Recharge successful!', 'success')
@@ -49,14 +85,23 @@ def recharge():
 @login_required
 def travel():
     if request.method == 'POST':
+        booking_type = request.form.get('booking_type', 'Flights')
         destination = request.form.get('destination')
         amount = 5000.0 # Mock flat rate
+        
+        category = 'travel'
+        if booking_type == 'Movies':
+            category = 'movies'
+            desc = f"Movie Ticket: {destination}"
+        else:
+            desc = f"{booking_type} Booking to {destination}"
+            
         if current_user.balance >= amount:
             current_user.balance -= amount
-            tx = Transaction(user_id=current_user.id, amount=-amount, type='debit', category='travel', description=f"Booking to {destination}")
+            tx = Transaction(user_id=current_user.id, amount=-amount, type='debit', category=category, description=desc)
             db.session.add(tx)
             db.session.commit()
-            flash(f'Booking to {destination} confirmed!', 'success')
+            flash(f'Confirmed: {desc}!', 'success')
             return redirect(url_for('dashboard.home'))
         else:
             flash('Insufficient balance for booking.', 'danger')

@@ -1,7 +1,10 @@
 import os
+from dotenv import load_dotenv
 from flask import Flask, redirect, url_for
 from flask_login import LoginManager, current_user
 from models import db, User
+
+load_dotenv()
 
 def create_app():
     app = Flask(__name__)
@@ -10,7 +13,7 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
-
+    
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
@@ -41,4 +44,4 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True, port=5001)
+    app.run(host='0.0.0.0', debug=True, port=5001)

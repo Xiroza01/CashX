@@ -5,7 +5,7 @@
 </div>
 
 <div class="glass-panel">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <div class="passbook-header">
         <h2><i class="fa-solid fa-book" style="color: var(--primary);"></i> Passbook</h2>
         <div style="text-align: right;">
             <p style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Available Balance</p>
@@ -13,12 +13,28 @@
         </div>
     </div>
     
-    <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-        <a href="#" class="btn btn-primary" style="padding: 6px 15px; font-size: 0.9rem; flex: 1; max-width: 100px;">All</a>
-        <a href="#" class="btn btn-secondary" style="padding: 6px 15px; font-size: 0.9rem; flex: 1; max-width: 100px;">Payments</a>
-        <a href="#" class="btn btn-secondary" style="padding: 6px 15px; font-size: 0.9rem; flex: 1; max-width: 100px;">Recharges</a>
-        <div style="flex: 1;"></div>
-        <a href="#" class="btn btn-secondary" style="padding: 6px 15px; font-size: 0.9rem;"><i class="fa-solid fa-download"></i> Download Statement</a>
+    <div class="passbook-filters">
+        <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 200px;">
+            <label for="category-filter" style="color: var(--text-muted); font-size: 0.9rem;">Filter by:</label>
+            <select id="category-filter" class="form-control" style="background: var(--bg-card); color: var(--text-color); border: 1px solid var(--glass-border); padding: 8px; border-radius: 8px;">
+                <option value="all">All Categories</option>
+                <option value="shopping">Shopping</option>
+                <option value="food">Food</option>
+                <option value="recharge">Recharge</option>
+                <option value="bills">Bills</option>
+                <option value="travel">Travel</option>
+                <option value="movies">Movies</option>
+                <option value="top-up">Wallet Top-up</option>
+            </select>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 200px; justify-content: flex-end;">
+            <select id="download-format" class="form-control" style="width: auto; background: var(--bg-card); color: var(--text-color); border: 1px solid var(--glass-border); padding: 8px; border-radius: 8px;">
+                <option value="csv">CSV format</option>
+                <option value="excel">Excel (.xls) format</option>
+                <option value="pdf">PDF format</option>
+            </select>
+            <a href="#" id="download-btn" class="btn btn-secondary" style="padding: 8px 15px; font-size: 0.9rem;"><i class="fa-solid fa-download"></i> Download</a>
+        </div>
     </div>
 
     {% if transactions %}
@@ -36,7 +52,7 @@
             </thead>
             <tbody>
                 {% for tx in transactions %}
-                <tr>
+                <tr class="tx-row" data-category="{{ tx.category }}">
                     <td style="color: var(--text-muted); font-size: 0.9rem;">{{ tx.timestamp.strftime('%d %b %Y, %I:%M %p') }}</td>
                     <td style="font-family: monospace; color: var(--text-muted);">TXN{{ "%.6d"|format(tx.id) }}</td>
                     <td style="font-weight: 500;">{{ tx.description }}</td>
@@ -57,4 +73,37 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+    // Category Filter Logic
+    document.getElementById('category-filter').addEventListener('change', function() {
+        const filter = this.value.toLowerCase();
+        document.querySelectorAll('.tx-row').forEach(row => {
+            if (filter === 'all') {
+                row.style.display = '';
+            } else {
+                const cat = row.dataset.category.toLowerCase();
+                if (cat === filter) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+    });
+
+    // Download Statement Logic
+    document.getElementById('download-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        const format = document.getElementById('download-format').value;
+        const baseUrl = "{{ url_for('dashboard.download_statement') }}";
+        const downloadUrl = baseUrl + "?format=" + format;
+        
+        if(format === 'pdf') {
+            window.open(downloadUrl, '_blank');
+        } else {
+            window.location.href = downloadUrl;
+        }
+    });
+</script>
 {% endblock %}
