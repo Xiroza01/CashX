@@ -12,6 +12,7 @@ class User(UserMixin, db.Model):
     upi_id = db.Column(db.String(50), unique=True, nullable=True)
     pin_hash = db.Column(db.String(255), nullable=False)
     profile_pic = db.Column(db.String(255), default='https://ui-avatars.com/api/?name=User&background=random')
+    otp_consent = db.Column(db.Boolean, default=False)
     balance = db.Column(db.Float, default=5000.0) # Mock starting balance
     gold_balance_grams = db.Column(db.Float, default=0.0)
     

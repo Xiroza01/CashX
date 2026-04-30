@@ -1,0 +1,115 @@
+mutation CreateDemoData @transaction @auth(level: USER, insecureReason: "This operation is for seeding demo data and can be run by any authenticated user.") {
+  user_insertMany(data: [
+    {
+      id: "10000000-0000-4000-8000-000000000001",
+      displayName: "Alice Smith",
+      createdAt: "2023-01-01T10:00:00Z",
+      email: "alice@example.com"
+    },
+    {
+      id: "10000000-0000-4000-8000-000000000002",
+      displayName: "Bob Johnson",
+      createdAt: "2023-01-02T11:00:00Z",
+      email: "bob@example.com"
+    }
+  ])
+  movie_insertMany(data: [
+    {
+      id: "20000000-0000-4000-8000-000000000001",
+      title: "The Great Adventure",
+      year: 2020,
+      createdAt: "2023-01-03T12:00:00Z",
+      summary: "An exciting journey through uncharted lands.",
+      genres: ["Adventure", "Action"],
+      runtime: 120,
+      posterUrl: "https://example.com/poster1.jpg"
+    },
+    {
+      id: "20000000-0000-4000-8000-000000000002",
+      title: "Mystery in the Mansion",
+      year: 2021,
+      createdAt: "2023-01-04T13:00:00Z",
+      summary: "A thrilling whodunit set in a mysterious old mansion.",
+      genres: ["Mystery", "Thriller"],
+      runtime: 105,
+      posterUrl: "https://example.com/poster2.jpg"
+    }
+  ])
+  movieList_insertMany(data: [
+    {
+      id: "30000000-0000-4000-8000-000000000001",
+      userId: "10000000-0000-4000-8000-000000000001",
+      name: "Alice's Favorites",
+      public: true,
+      createdAt: "2023-01-05T14:00:00Z",
+      updatedAt: "2023-01-05T14:00:00Z",
+      description: "My top picks for movies."
+    },
+    {
+      id: "30000000-0000-4000-8000-000000000002",
+      userId: "10000000-0000-4000-8000-000000000002",
+      name: "Bob's Watchlist",
+      public: false,
+      createdAt: "2023-01-06T15:00:00Z",
+      updatedAt: "2023-01-06T15:00:00Z",
+      description: "Movies I plan to watch soon."
+    }
+  ])
+  movieListEntry_insertMany(data: [
+    {
+      movieListId: "30000000-0000-4000-8000-000000000001",
+      movieId: "20000000-0000-4000-8000-000000000001",
+      position: 1,
+      createdAt: "2023-01-07T16:00:00Z",
+      note: "Highly recommended!"
+    },
+    {
+      movieListId: "30000000-0000-4000-8000-000000000002",
+      movieId: "20000000-0000-4000-8000-000000000002",
+      position: 1,
+      createdAt: "2023-01-08T17:00:00Z"
+    }
+  ])
+  watch_insertMany(data: [
+    {
+      id: "40000000-0000-4000-8000-000000000001",
+      userId: "10000000-0000-4000-8000-000000000001",
+      movieId: "20000000-0000-4000-8000-000000000001",
+      watchDate: "2023-01-09",
+      createdAt: "2023-01-09T18:00:00Z",
+      location: "Home"
+    },
+    {
+      id: "40000000-0000-4000-8000-000000000002",
+      userId: "10000000-0000-4000-8000-000000000002",
+      movieId: "20000000-0000-4000-8000-000000000002",
+      watchDate: "2023-01-10",
+      createdAt: "2023-01-10T19:00:00Z"
+    }
+  ])
+  review_insertMany(data: [
+    {
+      id: "50000000-0000-4000-8000-000000000001",
+      userId: "10000000-0000-4000-8000-000000000001",
+      movieId: "20000000-0000-4000-8000-000000000001",
+      watchId: "40000000-0000-4000-8000-000000000001",
+      rating: 5,
+      public: true,
+      createdAt: "2023-01-11T20:00:00Z",
+      updatedAt: "2023-01-11T20:00:00Z",
+      text: "Absolutely loved this movie!",
+      shareableLink: "https://example.com/review1"
+    },
+    {
+      id: "50000000-0000-4000-8000-000000000002",
+      userId: "10000000-0000-4000-8000-000000000002",
+      movieId: "20000000-0000-4000-8000-000000000002",
+      watchId: "40000000-0000-4000-8000-000000000002",
+      rating: 4,
+      public: false,
+      createdAt: "2023-01-12T21:00:00Z",
+      updatedAt: "2023-01-12T21:00:00Z",
+      text: "A well-crafted mystery, kept me guessing."
+    }
+  ])
+}

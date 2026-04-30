@@ -1,0 +1,24 @@
+{
+  "name": "cashx",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xiroza01/CashX.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xiroza01/CashX/issues"
+  },
+  "homepage": "https://github.com/xiroza01/CashX#readme",
+  "description": "",
+  "dependencies": {
+    "@dataconnect/generated": "file:src/dataconnect-generated",
+    "firebase": "^12.12.1"
+  }
+}

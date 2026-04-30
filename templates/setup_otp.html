@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="glass-panel" style="max-width: 800px; margin: 40px auto; padding: 40px;">
+    <h2>🔧 OTP Service Setup</h2>
+    <p>Configure your Email and SMS credentials to send real OTPs.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}" style="margin-bottom: 20px; padding: 15px; border-radius: 8px; background: rgba(255,255,255,0.1);">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div style="display: flex; gap: 30px; margin-top: 30px;">
+        <!-- Email Setup -->
+        <div style="flex: 1; background: rgba(0,0,0,0.2); padding: 25px; border-radius: 12px;">
+            <h3>📧 Email OTP (Gmail)</h3>
+            <form method="POST" action="{{ url_for('auth.setup_otp_save') }}">
+                <input type="hidden" name="type" value="email">
+                <div class="form-group">
+                    <label>Gmail Address</label>
+                    <input type="email" name="email_user" class="form-control" value="{{ email_user }}" required>
+                </div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Gmail App Password</label>
+                    <input type="password" name="email_pass" class="form-control" placeholder="16-character app password" value="{{ email_pass }}" required>
+                    <small style="display: block; margin-top: 5px; color: #ccc;">
+                        * Do not use your normal password. Go to Google Account -> Security -> 2-Step Verification -> App Passwords to generate this.
+                    </small>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 20px;">Save & Test Email</button>
+            </form>
+        </div>
+
+        <!-- SMS Setup -->
+        <div style="flex: 1; background: rgba(0,0,0,0.2); padding: 25px; border-radius: 12px;">
+            <h3>📱 SMS OTP (Twilio)</h3>
+            <form method="POST" action="{{ url_for('auth.setup_otp_save') }}">
+                <input type="hidden" name="type" value="sms">
+                <div class="form-group">
+                    <label>Twilio Account SID</label>
+                    <input type="text" name="twilio_sid" class="form-control" value="{{ twilio_sid }}" required>
+                </div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Twilio Auth Token</label>
+                    <input type="password" name="twilio_token" class="form-control" value="{{ twilio_token }}" required>
+                </div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Twilio Phone Number</label>
+                    <input type="text" name="twilio_phone" class="form-control" value="{{ twilio_phone }}" required>
+                </div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Test Phone Number (To receive test SMS)</label>
+                    <input type="text" name="test_phone" class="form-control" placeholder="Your real number (e.g. +1234567890)" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 20px;">Save & Test SMS</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
